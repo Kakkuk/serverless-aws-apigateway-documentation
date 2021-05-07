@@ -52,6 +52,65 @@ class ServerlessAWSDocumentation {
             },
         }
     };
+
+		//validation rules for 'documentation' property on 'http' event from 'aws' provider
+		const docConfigSchema = {
+			type: 'object',
+			definitions: {
+				models: {
+					type: 'object',
+					patternProperties: { '*/*': { type: 'string' } }
+				},
+				body: {
+					type: 'object',
+					properties: { description: { type: 'string' } }
+				},
+				arrayOfProps: {
+					type: 'array',
+					items: [
+						{
+							type: 'object',
+							properties: { name: { type: 'string' }, description: { type: 'string' } },
+							required: [ 'name' ]
+						}
+					]
+				}
+			},
+			properties: {
+				documentation: {
+					type: 'object',
+					properties: {
+						summary: { type: 'string' },
+						description: { type: 'string' },
+						tags: { type: 'array', items: [ { type: 'string' } ] },
+						requestBody: { "'$ref'": '#/definitions/body' },
+						requestHeaders: { "'$ref'": '#/definitions/arrayOfProps' },
+						queryParams: { "'$ref'": '#/definitions/arrayOfProps' },
+						pathParams: { "'$ref'": '#/definitions/arrayOfProps' },
+						requestModels: { "'$ref'": '#/definitions/models' },
+
+						methodResponses: {
+							type: 'array',
+							items: [
+								{
+									type: 'object',
+									properties: {
+										statusCode: { type: 'number' },
+										responseBody: { "'$ref'": '#/definitions/body' },
+										responseHeaders: { "'$ref'": '#/definitions/arrayOfProps' },
+										responseModels: { "'$ref'": '#/definitions/models' }
+									},
+									required: [ 'statusCode' ]
+								}
+							]
+						}
+					}
+				}
+			}
+		};
+
+		//create schema for 'documentation' property
+		this.serverless.configSchemaHandler.defineFunctionEventProperties('aws', 'http', docConfigSchema);
   }
 
   beforeDeploy() {
@@ -193,8 +252,7 @@ class ServerlessAWSDocumentation {
 
       return Promise.reject(err);
     });
-  }
-
+  }	
 }
 
 module.exports = ServerlessAWSDocumentation;
