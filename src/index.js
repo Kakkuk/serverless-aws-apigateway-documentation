@@ -252,7 +252,7 @@ class ServerlessAWSDocumentation {
 
       return Promise.reject(err);
     });
-  }	
+  }
 }
 
 module.exports = ServerlessAWSDocumentation;
