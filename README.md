@@ -307,7 +307,10 @@ See the Serverless documentation for more information on [resource naming](https
 
 To download the deployed documentation you just need to use `serverless downloadDocumentation --outputFileName=filename.ext`.
 For `yml` or `yaml` extensions application/yaml content will be downloaded from AWS. In any other case - application/json.
+
 Optional argument --extensions ['integrations', 'apigateway', 'authorizers', 'postman']. Defaults to 'integrations'.
+
+Optional argument --exportType ['oas30', 'swagger']. Defaults to 'swagger'.
 
 ## Contribution
 

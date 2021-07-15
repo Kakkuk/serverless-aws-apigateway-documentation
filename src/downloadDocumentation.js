@@ -8,7 +8,7 @@ module.exports = {
       return aws.request('APIGateway', 'getExport', {
         stageName: aws.getStage(),
         restApiId: restApiId,
-        exportType: 'swagger',
+        exportType: exportType(this.options.exportType),
         parameters: {
           extensions: extensionType(this.options.extensions),
         },
@@ -47,6 +47,10 @@ function createAWSContentType(outputFileName) {
   }
 
   return awsContentType;
+}
+
+function exportType(exportArg) {
+  return ['swagger', 'oas30'].includes(exportArg) ? exportArg : 'swagger';
 }
 
 function extensionType(extensionArg) {

@@ -49,6 +49,10 @@ class ServerlessAWSDocumentation {
                     required: false,
                     type: 'multiple'
                 },
+                exportType: {
+                    required: false,
+                    type: 'string',
+                },
             },
         }
     };
