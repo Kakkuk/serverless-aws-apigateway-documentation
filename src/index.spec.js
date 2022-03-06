@@ -36,6 +36,22 @@ describe('ServerlessAWSDocumentation', function () {
         getAllFunctions: jasmine.createSpy('getAllFunctions').and.callFake(() => {
           return this.serverlessMock.service._functionNames;
         }),
+        custom: {
+          documentation: {
+            version: '1',
+            models: [{
+              name: 'TestModel',
+              contentType: 'application/json',
+              schema: 'some complex schema',
+              description: 'the test model schema',
+            }, {
+              name: 'OtherModel',
+              contentType: 'application/json',
+              schema: 'some even more complex schema',
+              description: 'the other test model schema',
+            }],
+          },
+        }
       },
       variables: {
         service: {
@@ -78,7 +94,7 @@ describe('ServerlessAWSDocumentation', function () {
   describe('before deploy', function () {
 
     it('should init', function () {
-      delete this.serverlessMock.variables.service.custom;
+      delete this.serverlessMock.service.custom;
 
       expect(this.plugin.provider).toBe('aws');
       expect(this.plugin.serverless).toBe(this.serverlessMock);
@@ -92,20 +108,20 @@ describe('ServerlessAWSDocumentation', function () {
     });
 
     it('shouldn\'t do anything if there are no custom variables', function () {
-      delete this.serverlessMock.variables.service.custom;
+      delete this.serverlessMock.service.custom;
       delete this.plugin.customVars;
       this.plugin.beforeDeploy();
       expect(this.serverlessMock.service.getAllFunctions).not.toHaveBeenCalled();
     });
 
     it('shouldn\'t do anything if there is no documentation part in custom variables', function () {
-      delete this.plugin.customVars.documentation;
+      delete this.plugin.serverless.service.custom.documentation;
       this.plugin.beforeDeploy();
       expect(this.serverlessMock.service.getAllFunctions).not.toHaveBeenCalled();
     });
 
     it('should work even if there are no models in custom variables', function () {
-      delete this.plugin.customVars.documentation.models;
+      delete this.plugin.serverless.service.custom.documentation.models;
       this.plugin.beforeDeploy();
       expect(this.serverlessMock.service.getAllFunctions).toHaveBeenCalled();
       expect(this.serverlessMock.service.provider.compiledCloudFormationTemplate).toEqual({
@@ -127,7 +143,7 @@ describe('ServerlessAWSDocumentation', function () {
 
     it('should add models but not add them to http events', function () {
       // also add a model with no schema
-      this.serverlessMock.variables.service.custom.documentation.models.push({
+      this.serverlessMock.service.custom.documentation.models.push({
         name: 'NoSchemaModel',
         contentType: 'application/json',
         description: 'the other test model schema',
@@ -188,7 +204,7 @@ describe('ServerlessAWSDocumentation', function () {
     });
 
     it('should not do anything if a function has no http ApiGateway trigger', function () {
-      this.serverlessMock.variables.service.custom.documentation.models = [];
+      this.serverlessMock.service.custom.documentation.models = [];
       this.serverlessMock.service._functionNames = ['test', 'blub'];
       this.serverlessMock.service._functions = {
         test: {
@@ -223,7 +239,7 @@ describe('ServerlessAWSDocumentation', function () {
     });
 
     it('should only add response methods to ApiGateway methods', function () {
-      this.serverlessMock.variables.service.custom.documentation.models = [];
+      this.serverlessMock.service.custom.documentation.models = [];
       this.serverlessMock.service._functionNames = ['test', 'blub'];
       this.serverlessMock.service._functions = {
         test: {
@@ -346,7 +362,7 @@ describe('ServerlessAWSDocumentation', function () {
     });
 
     it('should add response methods with integer statusCode to ApiGateway methods', function () {
-      this.serverlessMock.variables.service.custom.documentation.models = [];
+      this.serverlessMock.service.custom.documentation.models = [];
       this.serverlessMock.service._functionNames = ['test', 'blub'];
       this.serverlessMock.service._functions = {
         test: {
@@ -469,7 +485,7 @@ describe('ServerlessAWSDocumentation', function () {
     });
 
     it('should add multiple response models with different content types for the same HTTP status code to ApiGateway methods', function () {
-      this.serverlessMock.variables.service.custom.documentation.models = [{
+      this.serverlessMock.service.custom.documentation.models = [{
         name: 'CreateResponseJson',
         contentType: "application/json",
         schema: {
@@ -579,7 +595,7 @@ describe('ServerlessAWSDocumentation', function () {
     });
 
     it('should use the provider rest api id', function () {
-      this.serverlessMock.variables.service.custom.documentation.models = [{
+      this.serverlessMock.service.custom.documentation.models = [{
         name: 'CreateResponseJson',
         contentType: "application/json",
         schema: {
@@ -673,7 +689,7 @@ describe('ServerlessAWSDocumentation', function () {
     });
 
     it('should only add response methods with existing MethodResponses to ApiGateway methods', function () {
-      this.serverlessMock.variables.service.custom.documentation.models = [];
+      this.serverlessMock.service.custom.documentation.models = [];
       this.serverlessMock.service._functionNames = ['test'];
       this.serverlessMock.service._functions = {
         test: {
@@ -759,7 +775,7 @@ describe('ServerlessAWSDocumentation', function () {
     });
 
     it('should only add response methods with existing and new MethodResponses to ApiGateway methods', function () {
-      this.serverlessMock.variables.service.custom.documentation.models = [];
+      this.serverlessMock.service.custom.documentation.models = [];
       this.serverlessMock.service._functionNames = ['test'];
       this.serverlessMock.service._functions = {
         test: {
@@ -842,7 +858,7 @@ describe('ServerlessAWSDocumentation', function () {
     });
 
     it('should only add response methods with existing empty MethodResponses to ApiGateway methods', function () {
-      this.serverlessMock.variables.service.custom.documentation.models = [];
+      this.serverlessMock.service.custom.documentation.models = [];
       this.serverlessMock.service._functionNames = ['test'];
       this.serverlessMock.service._functions = {
         test: {
@@ -918,9 +934,8 @@ describe('ServerlessAWSDocumentation', function () {
       });
     });
 
-
     it('should only add response methods with response headers to ApiGateway methods', function () {
-      this.serverlessMock.variables.service.custom.documentation.models = [];
+      this.serverlessMock.service.custom.documentation.models = [];
       this.serverlessMock.service._functionNames = ['test', 'blub'];
       this.serverlessMock.service._functions = {
         test: {
@@ -1079,7 +1094,7 @@ describe('ServerlessAWSDocumentation', function () {
     });
 
     it('should only add request models to ApiGateway methods', function () {
-      this.serverlessMock.variables.service.custom.documentation.models = [];
+      this.serverlessMock.service.custom.documentation.models = [];
       this.serverlessMock.service._functionNames = ['test', 'blub'];
       this.serverlessMock.service._functions = {
         test: {
@@ -1164,7 +1179,7 @@ describe('ServerlessAWSDocumentation', function () {
     });
 
     it('should only add documentation but no request models to ApiGateway methods', function () {
-      this.serverlessMock.variables.service.custom.documentation.models = [];
+      this.serverlessMock.service.custom.documentation.models = [];
       this.serverlessMock.service._functionNames = ['test', 'blub'];
       this.serverlessMock.service._functions = {
         test: {
@@ -1240,7 +1255,7 @@ describe('ServerlessAWSDocumentation', function () {
     });
 
     it('should add response methods and request models to ApiGateway methods', function () {
-      this.serverlessMock.variables.service.custom.documentation.models = [];
+      this.serverlessMock.service.custom.documentation.models = [];
       this.serverlessMock.service._functionNames = ['test', 'blub'];
       this.serverlessMock.service._functions = {
         test: {
@@ -1359,7 +1374,7 @@ describe('ServerlessAWSDocumentation', function () {
     });
 
     it('should not add any models to ApiGateway methods when http event is there but no models attached', function () {
-      this.serverlessMock.variables.service.custom.documentation.models = [];
+      this.serverlessMock.service.custom.documentation.models = [];
       this.serverlessMock.service._functionNames = ['test', 'blub'];
       this.serverlessMock.service._functions = {
         test: {
@@ -1423,7 +1438,7 @@ describe('ServerlessAWSDocumentation', function () {
     it('should not add request headers and query parameters in safe mode', function() {
       this.optionsMock = {'doc-safe-mode': true};
       this.plugin = new ServerlessAWSDocumentation(this.serverlessMock, this.optionsMock);
-      this.serverlessMock.variables.service.custom.documentation.models = [];
+      this.serverlessMock.service.custom.documentation.models = [];
       this.serverlessMock.service._functionNames = ['test', 'blub'];
       this.serverlessMock.service._functions = {
         test: {
@@ -1496,7 +1511,7 @@ describe('ServerlessAWSDocumentation', function () {
     });
 
     it('should add request headers and query parameters', function() {
-      this.serverlessMock.variables.service.custom.documentation.models = [];
+      this.serverlessMock.service.custom.documentation.models = [];
       this.serverlessMock.service._functionNames = ['test', 'blub'];
       this.serverlessMock.service._functions = {
         test: {
@@ -1574,7 +1589,7 @@ describe('ServerlessAWSDocumentation', function () {
     });
 
     it('should add request headers and query parameters with required=false by default', function() {
-      this.serverlessMock.variables.service.custom.documentation.models = [];
+      this.serverlessMock.service.custom.documentation.models = [];
       this.serverlessMock.service._functionNames = ['test', 'blub'];
       this.serverlessMock.service._functions = {
         test: {
@@ -1662,8 +1677,9 @@ describe('ServerlessAWSDocumentation', function () {
         },
       });
     });
+
     it('should only add request headers and query parameters, not modify existing', function() {
-      this.serverlessMock.variables.service.custom.documentation.models = [];
+      this.serverlessMock.service.custom.documentation.models = [];
       this.serverlessMock.service._functionNames = ['test', 'blub'];
       this.serverlessMock.service._functions = {
         test: {
@@ -2428,9 +2444,6 @@ describe('ServerlessAWSDocumentation', function () {
         },
       })
     })
-
-
-
   });
 
   describe('after deploy', function () {
@@ -2453,21 +2466,21 @@ describe('ServerlessAWSDocumentation', function () {
     });
 
     it('should build documentation with deploying and upload to api gateway', function (done) {
-      this.serverlessMock.variables.service.custom.documentation.api = {
+      this.serverlessMock.service.custom.documentation.api = {
         description: 'this is an api',
         tags: [
           {name: 'tag1', description: 'First tag'},
           {name: 'tag2', description: 'Second tag'}
         ]
       };
-      this.serverlessMock.variables.service.custom.documentation.authorizers = [{
+      this.serverlessMock.service.custom.documentation.authorizers = [{
         name: 'an-authorizer',
         description: 'this is an authorizer',
       }, {
         name: 'no-authorizer',
         description: 'this is not an authorizer',
       }];
-      this.serverlessMock.variables.service.custom.documentation.resources = [{
+      this.serverlessMock.service.custom.documentation.resources = [{
         path: 'super/path',
         description: 'this is a super path',
       }, {
@@ -2857,10 +2870,10 @@ describe('ServerlessAWSDocumentation', function () {
     });
 
     it('should build documentation for all http event under a function', function (done) {
-      this.serverlessMock.variables.service.custom.documentation.api = {
+      this.serverlessMock.service.custom.documentation.api = {
         description: 'this is an api',
       };
-      this.serverlessMock.variables.service.custom.documentation.resources = [{
+      this.serverlessMock.service.custom.documentation.resources = [{
         path: 'super/path',
         description: 'this is a super path',
       }, {
@@ -3066,17 +3079,17 @@ describe('ServerlessAWSDocumentation', function () {
     it('should generate documentation version when no version is there', function (done) {
       spyOn(console, 'info');
 
-      this.serverlessMock.variables.service.custom.documentation.api = {
+      this.serverlessMock.service.custom.documentation.api = {
         description: 'this is an api',
       };
-      this.serverlessMock.variables.service.custom.documentation.authorizers = [{
+      this.serverlessMock.service.custom.documentation.authorizers = [{
         name: 'an-authorizer',
         description: 'this is an authorizer',
       }, {
         name: 'no-authorizer',
         description: 'this is not an authorizer',
       }];
-      this.serverlessMock.variables.service.custom.documentation.resources = [{
+      this.serverlessMock.service.custom.documentation.resources = [{
         path: 'super/path',
         description: 'this is a super path',
       }, {
@@ -3187,7 +3200,7 @@ describe('ServerlessAWSDocumentation', function () {
       this.optionsMock.stage = 'megastage';
       this.optionsMock.region = 'hyperregion';
 
-      delete this.serverlessMock.variables.service.custom.documentation.version;
+      delete this.serverlessMock.service.custom.documentation.version;
       this.serverlessMock.providers.aws.naming.getStackName.and.returnValue('superstack');
 
       this.serverlessMock.providers.aws.request.and.callFake((api, method) => {
@@ -3263,7 +3276,7 @@ describe('ServerlessAWSDocumentation', function () {
 
     it('should not do anything if a list documentation part is not an array', function (done) {
       spyOn(console, 'info');
-      this.serverlessMock.variables.service.custom.documentation.models = {
+      this.serverlessMock.service.custom.documentation.models = {
         this: 'is wrong',
       };
       this.serverlessMock.providers.aws.request.and.returnValue(Promise.resolve({
@@ -3318,17 +3331,17 @@ describe('ServerlessAWSDocumentation', function () {
     });
 
     it('should generate different documentation versions for different documentation content', function() {
-      this.serverlessMock.variables.service.custom.documentation.api = {
+      this.serverlessMock.service.custom.documentation.api = {
         description: 'this is an api',
       };
-      this.serverlessMock.variables.service.custom.documentation.authorizers = [{
+      this.serverlessMock.service.custom.documentation.authorizers = [{
         name: 'an-authorizer',
         description: 'this is an authorizer',
       }, {
         name: 'no-authorizer',
         description: 'this is not an authorizer',
       }];
-      this.serverlessMock.variables.service.custom.documentation.resources = [{
+      this.serverlessMock.service.custom.documentation.resources = [{
         path: 'super/path',
         description: 'this is a super path',
       }, {
@@ -3434,13 +3447,13 @@ describe('ServerlessAWSDocumentation', function () {
         },
       };
 
-      delete this.serverlessMock.variables.service.custom.documentation.version;
+      delete this.serverlessMock.service.custom.documentation.version;
 
       this.plugin.generateAutoDocumentationVersion();
       const v1 = this.plugin.getDocumentationVersion();
 
       // change the global documentation content
-      delete this.serverlessMock.variables.service.custom.documentation.api;
+      delete this.serverlessMock.service.custom.documentation.api;
       this.plugin.generateAutoDocumentationVersion();
       const v2 = this.plugin.getDocumentationVersion();
       expect(v2).not.toBe(v1);

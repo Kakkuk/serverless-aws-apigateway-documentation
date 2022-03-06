@@ -8,8 +8,8 @@
     "test": "istanbul cover -x \"src/index.spec.js\" jasmine ./src/index.spec.js ./src/documentation.spec.js ./src/models.spec.js ./src/downloadDocumentation.spec.js",
     "test:nocoverage": "jasmine ./src/index.spec.js"
   },
-  "repository": "git@github.com:Kakkuk/serverless-aws-apigateway-documentation.git",
-  "author": "Kakkuk Team",
+  "repository": "git@github.com:failsafe-engineering/serverless-aws-apigateway-documentation.git",
+  "author": "Failsafe Engineering Team",
   "license": "MIT",
   "devDependencies": {
     "codecov": "^1.0.1",
