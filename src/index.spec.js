@@ -53,26 +53,6 @@ describe('ServerlessAWSDocumentation', function () {
           },
         }
       },
-      variables: {
-        service: {
-          custom: {
-            documentation: {
-              version: '1',
-              models: [{
-                name: 'TestModel',
-                contentType: 'application/json',
-                schema: 'some complex schema',
-                description: 'the test model schema',
-              }, {
-                name: 'OtherModel',
-                contentType: 'application/json',
-                schema: 'some even more complex schema',
-                description: 'the other test model schema',
-              }],
-            },
-          }
-        }
-      },
       configSchemaHandler: {
         defineFunctionEventProperties: jasmine.createSpy('define function event props')
       },
