@@ -16,9 +16,29 @@
     "eslint": "^3.11.1",
     "istanbul": "^0.4.5",
     "jasmine": "^2.5.2",
-    "jasmine-diff": "^0.1.2"
+    "jasmine-diff": "^0.1.2",
+    "jest": "^27.5.1"
   },
   "dependencies": {
     "object-hash": "^1.1.7"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "modulePaths": [
+      "./src"
+    ],
+    "transformIgnorePatterns": [
+      "node_modules/"
+    ],
+    "verbose": true,
+    "collectCoverage": true,
+    "coverageReporters": [
+      "text",
+      "lcov",
+      "text-summary"
+    ],
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ]
   }
 }
