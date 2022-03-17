@@ -9,7 +9,7 @@ function replaceModelRefs(restApiId, cfModel) {
         for (let key of Object.keys(obj)) {
             if (key === '$ref') {
                 let match;
-                if (match = /{{model:\s*([\-\w]+)}}/.exec(obj[key])) {
+                if (match = /{{model:\s*([\-\w]+)}}/.exec(obj[key])) { // eslint-disable-line no-cond-assign, no-useless-escape
                     obj[key] = {
                         'Fn::Join': [
                             '/',

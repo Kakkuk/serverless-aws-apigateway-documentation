@@ -1,8 +1,5 @@
 {
   "extends": "eslint:recommended",
-  "ecmaFeatures": {
-    "modules": true
-  },
   "rules": {
     "no-console": [
       "error",
@@ -20,7 +17,7 @@
   "env": {
     "browser": true,
     "node": true,
-    "es6": true
+    "es2017": true
   },
   "globals": {
     "afterEach": false,
@@ -37,6 +34,7 @@
     "xit": false,
     "beforeAll": false,
     "afterAll": false,
-    "runs": false
+    "runs": false,
+    "jest": false
   }
 }
