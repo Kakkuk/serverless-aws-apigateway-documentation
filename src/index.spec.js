@@ -3,18 +3,12 @@ describe('ServerlessAWSDocumentation', function () {
   const ServerlessAWSDocumentation = require('./index.js');
 
   beforeEach(function () {
-    jasmine.addMatchers(require('jasmine-diff')(jasmine, {
-      // Specify options here
-    }))
-  })
-
-  beforeEach(function () {
     this.serverlessMock = {
       providers: {
         aws: {
-          request: jasmine.createSpy('aws request'),
-          naming: jasmine.createSpyObj(['getStackName', 'getMethodLogicalId', 'normalizePath']),
-          getCredentials: jasmine.createSpy('aws get credentials'),
+          request: jest.fn(),
+          naming: { getStackName: jest.fn(), getMethodLogicalId: jest.fn(), normalizePath: jest.fn() },
+          getCredentials: jest.fn(),
         },
       },
       service: {
@@ -30,10 +24,10 @@ describe('ServerlessAWSDocumentation', function () {
             Outputs: {},
           }
         },
-        getFunction: jasmine.createSpy('getFunction').and.callFake((functionName) => {
+        getFunction: jest.fn().mockImplementation((functionName) => {
           return this.serverlessMock.service._functions[functionName];
         }),
-        getAllFunctions: jasmine.createSpy('getAllFunctions').and.callFake(() => {
+        getAllFunctions: jest.fn().mockImplementation(() => {
           return this.serverlessMock.service._functionNames;
         }),
         custom: {
@@ -54,15 +48,15 @@ describe('ServerlessAWSDocumentation', function () {
         }
       },
       configSchemaHandler: {
-        defineFunctionEventProperties: jasmine.createSpy('define function event props')
+        defineFunctionEventProperties: jest.fn()
       },
     };
 
-    this.serverlessMock.providers.aws.naming.getMethodLogicalId.and.callFake((resourcename, method) => {
+    this.serverlessMock.providers.aws.naming.getMethodLogicalId.mockImplementation((resourcename, method) => {
       return `${resourcename}_${method}`;
     });
 
-    this.serverlessMock.providers.aws.naming.normalizePath.and.callFake((path) => {
+    this.serverlessMock.providers.aws.naming.normalizePath.mockImplementation((path) => {
       return path.replace(/\//g, '');
     });
 
@@ -2439,8 +2433,8 @@ describe('ServerlessAWSDocumentation', function () {
     it('should get stack description', function () {
       this.optionsMock.stage = 'megastage';
       this.optionsMock.region = 'hyperregion';
-      this.serverlessMock.providers.aws.request.and.returnValue(new Promise(() => { }));
-      this.serverlessMock.providers.aws.naming.getStackName.and.returnValue('superstack');
+      this.serverlessMock.providers.aws.request.mockReturnValue(new Promise(() => { }));
+      this.serverlessMock.providers.aws.naming.getStackName.mockReturnValue('superstack');
       this.plugin.afterDeploy();
       expect(this.serverlessMock.providers.aws.request).toHaveBeenCalledWith('CloudFormation', 'describeStacks', { StackName: 'superstack' }, 'megastage', 'hyperregion');
     });
@@ -2569,8 +2563,8 @@ describe('ServerlessAWSDocumentation', function () {
 
       this.optionsMock.stage = 'megastage';
       this.optionsMock.region = 'hyperregion';
-      this.serverlessMock.providers.aws.naming.getStackName.and.returnValue('superstack');
-      this.serverlessMock.providers.aws.request.and.callFake((api, method) => {
+      this.serverlessMock.providers.aws.naming.getStackName.mockReturnValue('superstack');
+      this.serverlessMock.providers.aws.request.mockImplementation((api, method) => {
         switch (method) {
           case 'describeStacks':
             return Promise.resolve({
@@ -2888,8 +2882,8 @@ describe('ServerlessAWSDocumentation', function () {
 
       this.optionsMock.stage = 'megastage';
       this.optionsMock.region = 'hyperregion';
-      this.serverlessMock.providers.aws.naming.getStackName.and.returnValue('superstack');
-      this.serverlessMock.providers.aws.request.and.callFake((api, method) => {
+      this.serverlessMock.providers.aws.naming.getStackName.mockReturnValue('superstack');
+      this.serverlessMock.providers.aws.request.mockImplementation((api, method) => {
         switch (method) {
           case 'describeStacks':
             return Promise.resolve({
@@ -2979,11 +2973,11 @@ describe('ServerlessAWSDocumentation', function () {
     });
 
     it('should not deploy when documentation version is not updated', function (done) {
-      spyOn(console, 'info');
-      this.serverlessMock.providers.aws.naming.getStackName.and.returnValue('superstack');
-      this.serverlessMock.providers.aws.getCredentials.and.returnValue('awesome credentials');
+      jest.spyOn(console, 'info').mockImplementation(() => {});
+      this.serverlessMock.providers.aws.naming.getStackName.mockReturnValue('superstack');
+      this.serverlessMock.providers.aws.getCredentials.mockImplementation('awesome credentials');
 
-      this.serverlessMock.providers.aws.request.and.callFake((api, method) => {
+      this.serverlessMock.providers.aws.request.mockImplementation((api, method) => {
         switch (method) {
           case 'describeStacks':
             return Promise.resolve({
@@ -3000,24 +2994,24 @@ describe('ServerlessAWSDocumentation', function () {
             return Promise.resolve();
         }
       });
-      this.serverlessMock.providers.aws.naming.getStackName.and.returnValue('superstack');
+      this.serverlessMock.providers.aws.naming.getStackName.mockReturnValue('superstack');
       this.plugin.afterDeploy().then(() => {
         expect(this.serverlessMock.providers.aws.request).not.toHaveBeenCalledWith(
           'APIGateway',
           'createDocumentationPart',
-          jasmine.any(Object)
+          expect.any(Object)
         );
 
         expect(this.serverlessMock.providers.aws.request).not.toHaveBeenCalledWith(
           'APIGateway',
           'deleteDocumentationPart',
-          jasmine.any(Object)
+          expect.any(Object)
         );
 
         expect(this.serverlessMock.providers.aws.request).not.toHaveBeenCalledWith(
           'APIGateway',
           'createDocumentationPart',
-          jasmine.any(Object)
+          expect.any(Object)
         );
 
         expect(console.info).toHaveBeenCalledWith('documentation version already exists, skipping upload');
@@ -3026,10 +3020,10 @@ describe('ServerlessAWSDocumentation', function () {
     });
 
     it('should not deploy when documentation version failed otherwise', function (done) {
-      spyOn(console, 'info');
-      this.serverlessMock.providers.aws.naming.getStackName.and.returnValue('superstack');
+      jest.spyOn(console, 'info').mockImplementation(() => {});
+      this.serverlessMock.providers.aws.naming.getStackName.mockReturnValue('superstack');
 
-      this.serverlessMock.providers.aws.request.and.callFake((api, method) => {
+      this.serverlessMock.providers.aws.request.mockImplementation((api, method) => {
         switch (method) {
           case 'describeStacks':
             return Promise.resolve({
@@ -3047,17 +3041,17 @@ describe('ServerlessAWSDocumentation', function () {
         }
       });
 
-      this.serverlessMock.providers.aws.naming.getStackName.and.returnValue('superstack');
+      this.serverlessMock.providers.aws.naming.getStackName.mockReturnValue('superstack');
       this.plugin.afterDeploy().catch(() => {
-        expect(this.serverlessMock.providers.aws.request).not.toHaveBeenCalledWith('APIGateway', 'getDocumentationParts', jasmine.any(Object));
-        expect(this.serverlessMock.providers.aws.request).not.toHaveBeenCalledWith('APIGateway', 'deleteDocumentationPart', jasmine.any(Object));
-        expect(this.serverlessMock.providers.aws.request).not.toHaveBeenCalledWith('APIGateway', 'createDocumentationPart', jasmine.any(Object));
+        expect(this.serverlessMock.providers.aws.request).not.toHaveBeenCalledWith('APIGateway', 'getDocumentationParts', expect.any(Object));
+        expect(this.serverlessMock.providers.aws.request).not.toHaveBeenCalledWith('APIGateway', 'deleteDocumentationPart', expect.any(Object));
+        expect(this.serverlessMock.providers.aws.request).not.toHaveBeenCalledWith('APIGateway', 'createDocumentationPart', expect.any(Object));
         done();
       });
     });
 
     it('should generate documentation version when no version is there', function (done) {
-      spyOn(console, 'info');
+      jest.spyOn(console, 'info').mockImplementation(() => {});
 
       this.serverlessMock.service.custom.documentation.api = {
         description: 'this is an api',
@@ -3175,15 +3169,15 @@ describe('ServerlessAWSDocumentation', function () {
         },
       };
 
-      spyOn(this.plugin, 'generateAutoDocumentationVersion').and.callThrough();
+      jest.spyOn(this.plugin, 'generateAutoDocumentationVersion');
 
       this.optionsMock.stage = 'megastage';
       this.optionsMock.region = 'hyperregion';
 
       delete this.serverlessMock.service.custom.documentation.version;
-      this.serverlessMock.providers.aws.naming.getStackName.and.returnValue('superstack');
+      this.serverlessMock.providers.aws.naming.getStackName.mockReturnValue('superstack');
 
-      this.serverlessMock.providers.aws.request.and.callFake((api, method) => {
+      this.serverlessMock.providers.aws.request.mockImplementation((api, method) => {
         switch (method) {
           case 'describeStacks':
             return Promise.resolve({
@@ -3213,14 +3207,14 @@ describe('ServerlessAWSDocumentation', function () {
       });
 
       this.plugin.afterDeploy().then(() => {
-        expect(this.serverlessMock.providers.aws.request).toHaveBeenCalledWith('APIGateway', 'getDocumentationParts', jasmine.any(Object));
-        expect(this.serverlessMock.providers.aws.request).toHaveBeenCalledWith('APIGateway', 'deleteDocumentationPart', jasmine.any(Object));
+        expect(this.serverlessMock.providers.aws.request).toHaveBeenCalledWith('APIGateway', 'getDocumentationParts', expect.any(Object));
+        expect(this.serverlessMock.providers.aws.request).toHaveBeenCalledWith('APIGateway', 'deleteDocumentationPart', expect.any(Object));
         expect(this.serverlessMock.providers.aws.request).toHaveBeenCalledWith('APIGateway', 'getDocumentationVersion', {
           restApiId: 'superid',
-          documentationVersion: jasmine.any(String),
+          documentationVersion: expect.any(String),
         });
 
-        const getDocVersion = this.serverlessMock.providers.aws.request.calls.argsFor(1)[2].documentationVersion;
+        const getDocVersion = this.serverlessMock.providers.aws.request.mock.calls[1][2].documentationVersion;
         expect(this.serverlessMock.providers.aws.request).toHaveBeenCalledWith('APIGateway', 'createDocumentationVersion', {
           restApiId: 'superid',
           documentationVersion: getDocVersion,
@@ -3235,8 +3229,8 @@ describe('ServerlessAWSDocumentation', function () {
 
     it('should build documentation without deploying and display parts', function (done) {
       this.optionsMock.noDeploy = true;
-      spyOn(console, 'info');
-      this.serverlessMock.providers.aws.request.and.returnValue(Promise.resolve({
+      jest.spyOn(console, 'info').mockImplementation(() => {});
+      this.serverlessMock.providers.aws.request.mockReturnValue(Promise.resolve({
         Stacks: [{
           Outputs: [{
             OutputKey: 'ApiId',
@@ -3244,7 +3238,7 @@ describe('ServerlessAWSDocumentation', function () {
           }],
         }],
       }));
-      this.serverlessMock.providers.aws.naming.getStackName.and.returnValue('superstack');
+      this.serverlessMock.providers.aws.naming.getStackName.mockReturnValue('superstack');
 
       this.plugin.afterDeploy().then(() => {
         expect(this.serverlessMock.providers.aws.request).toHaveBeenCalledTimes(1);
@@ -3255,11 +3249,11 @@ describe('ServerlessAWSDocumentation', function () {
     });
 
     it('should not do anything if a list documentation part is not an array', function (done) {
-      spyOn(console, 'info');
+      jest.spyOn(console, 'info').mockImplementation(() => {});
       this.serverlessMock.service.custom.documentation.models = {
         this: 'is wrong',
       };
-      this.serverlessMock.providers.aws.request.and.returnValue(Promise.resolve({
+      this.serverlessMock.providers.aws.request.mockReturnValue(Promise.resolve({
         Stacks: [{
           Outputs: [{
             OutputKey: 'ApiId',
@@ -3267,7 +3261,7 @@ describe('ServerlessAWSDocumentation', function () {
           }],
         }],
       }));
-      this.serverlessMock.providers.aws.naming.getStackName.and.returnValue('superstack');
+      this.serverlessMock.providers.aws.naming.getStackName.mockReturnValue('superstack');
 
       this.plugin.afterDeploy().catch(() => {
         expect(console.info).toHaveBeenCalledWith('definition for type "MODEL" is not an array');
@@ -3276,7 +3270,7 @@ describe('ServerlessAWSDocumentation', function () {
     });
 
     it('should not do not delete any documentation parts if there are none', function (done) {
-      this.serverlessMock.providers.aws.request.and.callFake((api, method) => {
+      this.serverlessMock.providers.aws.request.mockImplementation((api, method) => {
         switch (method) {
           case 'describeStacks':
             return Promise.resolve({
@@ -3299,13 +3293,12 @@ describe('ServerlessAWSDocumentation', function () {
             return Promise.resolve();
         }
       });
-      this.serverlessMock.providers.aws.naming.getStackName.and.returnValue('superstack');
-
+      this.serverlessMock.providers.aws.naming.getStackName.mockReturnValue('superstack');
 
       this.plugin.afterDeploy().then(() => {
-        expect(this.serverlessMock.providers.aws.request).toHaveBeenCalledWith('APIGateway', 'getDocumentationParts', jasmine.any(Object));
-        expect(this.serverlessMock.providers.aws.request).not.toHaveBeenCalledWith('APIGateway', 'deleteDocumentationPart', jasmine.any(Object));
-        expect(this.serverlessMock.providers.aws.request).toHaveBeenCalledWith('APIGateway', 'createDocumentationPart', jasmine.any(Object));
+        expect(this.serverlessMock.providers.aws.request).toHaveBeenCalledWith('APIGateway', 'getDocumentationParts', expect.any(Object));
+        expect(this.serverlessMock.providers.aws.request).not.toHaveBeenCalledWith('APIGateway', 'deleteDocumentationPart', expect.any(Object));
+        expect(this.serverlessMock.providers.aws.request).toHaveBeenCalledWith('APIGateway', 'createDocumentationPart', expect.any(Object));
         done();
       });
     });
