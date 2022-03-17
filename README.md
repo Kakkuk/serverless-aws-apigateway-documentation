@@ -1,4 +1,7 @@
-[![serverless](http://public.serverless.com/badges/v3.svg)](http://www.serverless.com) [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/hyperium/hyper/master/LICENSE)
+[![serverless](http://public.serverless.com/badges/v3.svg)](http://www.serverless.com)
+[![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/hyperium/hyper/master/LICENSE)
+[![npm version](https://badge.fury.io/js/@kakkuk%2Fserverless-aws-apigateway-documentation.svg)](https://badge.fury.io/js/@kakkuk%2Fserverless-aws-apigateway-documentation)
+[![Known Vulnerabilities](https://snyk.io/test/npm/@kakkuk/serverless-aws-apigateway-documentation/badge.svg)](https://snyk.io/test/npm/@kakkuk/serverless-aws-apigateway-documentation)
 
 # Premise
 This project is forked from [serverless-aws-documentation](https://github.com/deliveryhero/serverless-aws-documentation) and it is supposed to fix a reported [provider integration issue](https://github.com/deliveryhero/serverless-aws-documentation/issues/175).
