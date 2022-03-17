@@ -5,7 +5,9 @@
   "main": "src/index.js",
   "scripts": {
     "codecov": "cat coverage/*/lcov.info | codecov",
-    "test": "jest"
+    "test": "jest",
+    "lint": "npx eslint",
+    "lint:fix": "npx eslint --fix"
   },
   "repository": "git@github.com:failsafe-engineering/serverless-aws-apigateway-documentation.git",
   "author": "Failsafe Engineering Team",
