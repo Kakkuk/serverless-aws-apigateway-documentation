@@ -2989,7 +2989,7 @@ describe('ServerlessAWSDocumentation', function () {
               }],
             });
           case 'getDocumentationVersion':
-            () => Promise.resolve();
+            promise: () => Promise.resolve();
           default: // eslint-disable-line  no-fallthrough
             return Promise.resolve();
         }
