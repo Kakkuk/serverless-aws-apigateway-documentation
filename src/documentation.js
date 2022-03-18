@@ -211,7 +211,7 @@ module.exports = function() {
 
         documentationPart.forEach(function(qp) {
           const source = `method.request.${mapPath}.${qp.name}`;
-          if (resource.Properties.RequestParameters.hasOwnProperty(source)) return; // don't mess with existing config
+          if (resource.Properties.RequestParameters.hasOwnProperty(source)) return; // eslint-disable-line no-prototype-builtins
           resource.Properties.RequestParameters[source] = qp.required || false;
         });
       }

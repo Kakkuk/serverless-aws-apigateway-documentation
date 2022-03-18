@@ -67,7 +67,7 @@ class ServerlessAWSDocumentation {
     };
     const modelsSchemaDefinition = {
       type: 'object',
-      patternProperties: { '.+\/.+': { type: 'string' } }
+      patternProperties: { '.+\/.+': { type: 'string' } } // eslint-disable-line no-useless-escape
     };
 
     //validation rules for 'documentation' property on 'http' event from 'aws' provider
@@ -174,7 +174,7 @@ class ServerlessAWSDocumentation {
                   Object.keys(method.responses).map(statusCode => {
                     const response = method.responses[statusCode];
                     const methodResponse = {
-                      statusCode: ""+statusCode,
+                      statusCode: ''+statusCode,
                     };
 
                     if ( response.schema ) {

@@ -461,13 +461,13 @@ describe('ServerlessAWSDocumentation', function () {
     it('should add multiple response models with different content types for the same HTTP status code to ApiGateway methods', function () {
       this.serverlessMock.service.custom.documentation.models = [{
         name: 'CreateResponseJson',
-        contentType: "application/json",
+        contentType: 'application/json',
         schema: {
           type: 'object'
         }
       }, {
         name: 'CreateResponseXml',
-        contentType: "application/xml",
+        contentType: 'application/xml',
         schema: {
           type: 'object'
         }
@@ -571,7 +571,7 @@ describe('ServerlessAWSDocumentation', function () {
     it('should use the provider rest api id', function () {
       this.serverlessMock.service.custom.documentation.models = [{
         name: 'CreateResponseJson',
-        contentType: "application/json",
+        contentType: 'application/json',
         schema: {
           type: 'object'
         }
@@ -2016,16 +2016,16 @@ describe('ServerlessAWSDocumentation', function () {
               produces: ['application/json'],
               responses: {
                 200: {
-                  description: "OK",
+                  description: 'OK',
                   schema: {
-                    $ref: "#/definitions/NoSchema"
+                    $ref: '#/definitions/NoSchema'
                   }
                 },
                 400: {
-                  description: "BR"
+                  description: 'BR'
                 },
                 500: {
-                  description: "ERR"
+                  description: 'ERR'
                 }
               }
             }
@@ -2990,7 +2990,7 @@ describe('ServerlessAWSDocumentation', function () {
             });
           case 'getDocumentationVersion':
             promise: () => Promise.resolve();
-          default:
+          default: // eslint-disable-line  no-fallthrough
             return Promise.resolve();
         }
       });
