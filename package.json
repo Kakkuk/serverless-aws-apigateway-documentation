@@ -1,6 +1,6 @@
 {
   "name": "@kakkuk/serverless-aws-apigateway-documentation",
-  "version": "1.1.11",
+  "version": "1.1.12",
   "description": "Serverless 1.0 plugin to add documentation and models to the serverless generated API Gateway",
   "main": "src/index.js",
   "scripts": {
