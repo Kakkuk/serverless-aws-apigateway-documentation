@@ -15,7 +15,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [14.x, 16.x, 18.x]
+#        node-version: [14.x, 16.x, 18.x]
+        node-version: [18.x]
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -35,51 +36,51 @@ jobs:
         run: npm run lint
       - name: Run tests
         run: npm test
-  bump_version:
-    name: Bump version
-    if: ${{ (github.event.pull_request.state == 'closed' && github.event.pull_request.merged == true) }}
-    runs-on: ubuntu-latest
-    needs: build_and_test
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup node
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
-          registry-url: "https://registry.npmjs.org"
-      - name: Setup debug session
-        uses: mxschmitt/action-tmate@v3
-        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.debug_enabled }}
-      - name: Configure Git
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-      - name: Set increment patch
-        if: contains(github.event.pull_request.title, 'patch')
-        run: npm version patch
-      - name: Set increment minor
-        if: contains(github.event.pull_request.title, 'minor')
-        run: npm version minor
-      - name: Set increment major
-        if: contains(github.event.pull_request.title, 'major')
-        run: npm version major
-      - name: Commit
-        if: contains(github.event.pull_request.title, 'patch') || contains(github.event.pull_request.title, 'minor') || contains(github.event.pull_request.title, 'major')
-        env:
-          RELEASE_MESSAGE: ${{ github.event.pull_request.title }}
-        run: |
-          git push "https://$GITHUB_ACTOR:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git" HEAD:$GITHUB_REF --follow-tags;
-          LATEST_TAG=$(git tag  | grep -E '^v[0-9]' | sort -V | tail -1);
-          curl --request POST \
-          --url https://api.github.com/repos/$GITHUB_REPOSITORY/releases \
-          --header "Authorization: token $GITHUB_TOKEN" \
-          --header "content-type: application/json" \
-          --data '{
-            "tag_name": "'"$LATEST_TAG"'",
-            "name": "'"$LATEST_TAG"'",
-            "body": "'"$RELEASE_MESSAGE"'",
-            "draft": true
-          }'
+#  bump_version:
+#    name: Bump version
+#    if: ${{ (github.event.pull_request.state == 'closed' && github.event.pull_request.merged == true) }}
+#    runs-on: ubuntu-latest
+#    needs: build_and_test
+#    env:
+#      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v3
+#      - name: Setup node
+#        uses: actions/setup-node@v3
+#        with:
+#          node-version: ${{ matrix.node-version }}
+#          registry-url: "https://registry.npmjs.org"
+#      - name: Setup debug session
+#        uses: mxschmitt/action-tmate@v3
+#        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.debug_enabled }}
+#      - name: Configure Git
+#        run: |
+#          git config --local user.email "action@github.com"
+#          git config --local user.name "GitHub Action"
+#      - name: Set increment patch
+#        if: contains(github.event.pull_request.title, 'patch')
+#        run: npm version patch
+#      - name: Set increment minor
+#        if: contains(github.event.pull_request.title, 'minor')
+#        run: npm version minor
+#      - name: Set increment major
+#        if: contains(github.event.pull_request.title, 'major')
+#        run: npm version major
+#      - name: Commit
+#        if: contains(github.event.pull_request.title, 'patch') || contains(github.event.pull_request.title, 'minor') || contains(github.event.pull_request.title, 'major')
+#        env:
+#          RELEASE_MESSAGE: ${{ github.event.pull_request.title }}
+#        run: |
+#          git push "https://$GITHUB_ACTOR:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git" HEAD:$GITHUB_REF --follow-tags;
+#          LATEST_TAG=$(git tag  | grep -E '^v[0-9]' | sort -V | tail -1);
+#          curl --request POST \
+#          --url https://api.github.com/repos/$GITHUB_REPOSITORY/releases \
+#          --header "Authorization: token $GITHUB_TOKEN" \
+#          --header "content-type: application/json" \
+#          --data '{
+#            "tag_name": "'"$LATEST_TAG"'",
+#            "name": "'"$LATEST_TAG"'",
+#            "body": "'"$RELEASE_MESSAGE"'",
+#            "draft": true
+#          }'
