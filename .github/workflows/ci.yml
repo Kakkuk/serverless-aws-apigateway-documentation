@@ -10,31 +10,31 @@ on:
         required: false
         default: false
 jobs:
-  build_and_test:
-    name: Build and test
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [18.x]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup node
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
-          registry-url: "https://registry.npmjs.org"
-      - name: Setup debug session
-        uses: mxschmitt/action-tmate@v3
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
-      - name: Upgrade npm
-        run: npm install -g npm@9.2.0
-      - name: Install dependencies
-        run: npm ci
-      - name: Lint code
-        run: npm run lint
-      - name: Run tests
-        run: npm test
+#  build_and_test:
+#    name: Build and test
+#    runs-on: ubuntu-latest
+#    strategy:
+#      matrix:
+#        node-version: [18.x]
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v3
+#      - name: Setup node
+#        uses: actions/setup-node@v3
+#        with:
+#          node-version: ${{ matrix.node-version }}
+#          registry-url: "https://registry.npmjs.org"
+#      - name: Setup debug session
+#        uses: mxschmitt/action-tmate@v3
+#        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
+#      - name: Upgrade npm
+#        run: npm install -g npm@9.2.0
+#      - name: Install dependencies
+#        run: npm ci
+#      - name: Lint code
+#        run: npm run lint
+#      - name: Run tests
+#        run: npm test
   bump_version:
     name: Bump version
 #    if: ${{ (github.event.pull_request.state == 'closed' && github.event.pull_request.merged == true) }}
@@ -44,7 +44,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          token: ${{ secrets.FAILSAFEADMIN_TOKEN }}
+          token: ${{ secrets.FAILSAFEADMIN_CLASSIC_TOKEN }}
       - name: Setup node
         uses: actions/setup-node@v3
         with:
@@ -70,7 +70,7 @@ jobs:
 #        if: contains(github.event.pull_request.title, 'patch') || contains(github.event.pull_request.title, 'minor') || contains(github.event.pull_request.title, 'major')
         env:
           GITHUB_COMMITER: failsafeadmin
-          GITHUB_TOKEN: ${{ secrets.FAILSAFEADMIN_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.FAILSAFEADMIN_CLASSIC_TOKEN }}
           RELEASE_MESSAGE: ${{ github.event.pull_request.title }}
         run: |
           echo $GITHUB_ACTOR;
