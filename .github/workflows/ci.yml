@@ -84,4 +84,3 @@ jobs:
             "body": "'"$RELEASE_MESSAGE"'",
             "draft": true
           }'
-
