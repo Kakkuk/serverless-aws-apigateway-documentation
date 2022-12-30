@@ -71,6 +71,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.FAILSAFEADMIN_TOKEN }}
           RELEASE_MESSAGE: ${{ github.event.pull_request.title }}
         run: |
+          echo $GITHUB_ACTOR;
+          echo $GITHUB_TOKEN;
+          echo $RELEASE_MESSAGE;
           git push "https://$GITHUB_ACTOR:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git" HEAD:$GITHUB_REF --follow-tags;
           LATEST_TAG=$(git tag  | grep -E '^v[0-9]' | sort -V | tail -1);
           curl --request POST \
