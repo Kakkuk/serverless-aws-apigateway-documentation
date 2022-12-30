@@ -41,14 +41,15 @@ jobs:
     runs-on: ubuntu-latest
     needs: build_and_test
     env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_ACTOR: failsafeadmin
+      GITHUB_TOKEN: ${{ secrets.FAILSAFEADMIN_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Setup node
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 18.x
           registry-url: "https://registry.npmjs.org"
       - name: Setup debug session
         uses: mxschmitt/action-tmate@v3

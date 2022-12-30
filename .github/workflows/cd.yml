@@ -45,7 +45,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 18.x
           registry-url: https://registry.npmjs.org/
       - name: Setup debug session
         uses: mxschmitt/action-tmate@v3
