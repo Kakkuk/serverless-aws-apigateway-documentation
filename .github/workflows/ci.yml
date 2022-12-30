@@ -43,6 +43,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.FAILSAFEADMIN_TOKEN }}
       - name: Setup node
         uses: actions/setup-node@v3
         with:
@@ -67,14 +69,15 @@ jobs:
       - name: Commit
 #        if: contains(github.event.pull_request.title, 'patch') || contains(github.event.pull_request.title, 'minor') || contains(github.event.pull_request.title, 'major')
         env:
-          GITHUB_ACTOR: failsafeadmin
+          GITHUB_COMMITER: failsafeadmin
           GITHUB_TOKEN: ${{ secrets.FAILSAFEADMIN_TOKEN }}
           RELEASE_MESSAGE: ${{ github.event.pull_request.title }}
         run: |
           echo $GITHUB_ACTOR;
+          echo $GITHUB_COMMITER;
           echo $GITHUB_TOKEN;
           echo $RELEASE_MESSAGE;
-          git push "https://$GITHUB_ACTOR:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git" HEAD:$GITHUB_REF --follow-tags;
+          git push "https://$GITHUB_COMMITER:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git" HEAD:$GITHUB_REF --follow-tags;
           LATEST_TAG=$(git tag  | grep -E '^v[0-9]' | sort -V | tail -1);
           curl --request POST \
           --url https://api.github.com/repos/$GITHUB_REPOSITORY/releases \
