@@ -44,7 +44,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          token: ${{ secrets.FAILSAFEADMIN_CLASSIC_TOKEN }}
+          token: ${{ secrets.FAILSAFEADMIN_TOKEN }}
       - name: Setup node
         uses: actions/setup-node@v3
         with:
@@ -70,7 +70,7 @@ jobs:
 #        if: contains(github.event.pull_request.title, 'patch') || contains(github.event.pull_request.title, 'minor') || contains(github.event.pull_request.title, 'major')
         env:
           GITHUB_COMMITER: failsafeadmin
-          GITHUB_TOKEN: ${{ secrets.FAILSAFEADMIN_CLASSIC_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.FAILSAFEADMIN_TOKEN }}
           RELEASE_MESSAGE: ${{ github.event.pull_request.title }}
         run: |
           echo $GITHUB_ACTOR;
