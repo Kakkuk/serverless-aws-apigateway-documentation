@@ -4,7 +4,6 @@
   "description": "Serverless 1.0 plugin to add documentation and models to the serverless generated API Gateway",
   "main": "src/index.js",
   "scripts": {
-    "codecov": "cat coverage/*/lcov.info | codecov",
     "test": "jest",
     "lint": "npx eslint",
     "lint:fix": "npx eslint --fix"
@@ -13,7 +12,6 @@
   "author": "Failsafe Engineering Team",
   "license": "MIT",
   "devDependencies": {
-    "codecov": "^3.8.3",
     "eslint": "^8.11.0",
     "jest": "^27.5.1"
   },
