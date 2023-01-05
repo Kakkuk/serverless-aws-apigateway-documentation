@@ -1,7 +1,7 @@
 'use strict';
 
 function replaceModelRefs(restApiId, cfModel) {
-    if (!cfModel.Properties || !cfModel.Properties.Schema || Object.keys(cfModel.Properties.Schema).length == 0) {
+    if (!cfModel.Properties || !cfModel.Properties.Schema || Object.keys(cfModel.Properties.Schema).length === 0) {
       return cfModel;
     }
 
@@ -9,7 +9,7 @@ function replaceModelRefs(restApiId, cfModel) {
         for (let key of Object.keys(obj)) {
             if (key === '$ref') {
                 let match;
-                if (match = /{{model:\s*([\-\w]+)}}/.exec(obj[key])) { // eslint-disable-line no-cond-assign, no-useless-escape
+                if ((match = /{{model:\s*([\-\w]+)}}/.exec(obj[key])) !== null) {
                     obj[key] = {
                         'Fn::Join': [
                             '/',

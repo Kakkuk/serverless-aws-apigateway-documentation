@@ -8,7 +8,7 @@ function replaceSwaggerRefs (swagger) {
     for (let key of Object.keys(obj)) {
       if (key === '$ref') {
         let match
-        if (match = /#\/definitions\/([\-\w]+)/.exec(obj[key])) { // eslint-disable-line no-cond-assign, no-useless-escape
+        if ((match = /#\/definitions\/([\-\w]+)/.exec(obj[key])) !== null) {
           obj[key] = '{{model: ' + match[1] + '}}'
         }
       } else if (typeof obj[key] === 'object') {
@@ -25,7 +25,7 @@ function extractModelDefinition(param, models) {
   // otherwise create a model to handle this response
   if (param.schema['$ref']) {
     let match
-    if (match = /#\/definitions\/([\-\w]+)/.exec(param.schema['$ref'])) { // eslint-disable-line no-cond-assign, no-useless-escape
+    if ((match = /#\/definitions\/([\-\w]+)/.exec(param.schema['$ref'])) !== null) {
       return match[1];
     }
   } else {
