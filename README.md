@@ -309,7 +309,13 @@ See the Serverless documentation for more information on [resource naming](https
 ### Download documentation from AWS API Gateway
 
 To download the deployed documentation you just need to use `serverless downloadDocumentation --outputFileName=filename.ext`.
-For `yml` or `yaml` extensions application/yaml content will be downloaded from AWS. In any other case - application/json.
+
+By default, the documentation will be downloaded in JSON format (content-type: application/json).
+To download it in YAML format (content-type: application/yaml), simply use `yml` or `yaml` extension in the "outputFileName" argument: `serverless downloadDocumentation --outputFileName=filename.yml`
+
+By default, the documentation will be downloaded in OpenAPI 2.0 (Swagger).
+To download it in OpenAPI 3.0, use `oas30` or `openapi30` type in the "exportType" argument: `serverless downloadDocumentation --outputFileName=filename.ext --exportType oas30`
+
 Optional argument --extensions ['integrations', 'apigateway', 'authorizers', 'postman']. Defaults to 'integrations'.
 
 ## Contribution
