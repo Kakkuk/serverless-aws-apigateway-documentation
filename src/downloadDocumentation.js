@@ -1,5 +1,7 @@
 'use strict';
 
+const fileUtils = require('./fileUtils.js');
+
 module.exports = {
   downloadDocumentation: function () {
     const aws = this.serverless.providers.aws;
@@ -32,17 +34,10 @@ module.exports = {
   },
 };
 
-function getFileExtension(filename) {
-  const path = require('path');
-  let ext = path.extname(filename || '').split('.');
-
-  return ext[ext.length - 1];
-}
-
 function createAWSContentType(outputFileName) {
-  const fileExtension = getFileExtension(outputFileName);
+  const fileExtension = fileUtils.getFileExtension(outputFileName);
   let awsContentType = 'application/json';
-  if (fileExtension === 'yml' || fileExtension === 'yaml') {
+  if (fileUtils.isYamlFileExtension(fileExtension)) {
     awsContentType = 'application/yaml';
   }
 

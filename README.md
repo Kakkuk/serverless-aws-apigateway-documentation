@@ -306,7 +306,19 @@ ApiGatewayMethod{normalizedPath}{normalizedMethod}:
 
 See the Serverless documentation for more information on [resource naming](https://serverless.com/framework/docs/providers/aws/guide/resources/), and the AWS documentation for more information on [request parameters](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apitgateway-method-integration.html#cfn-apigateway-method-integration-requestparameters).
 
-### Download documentation from AWS API Gateway
+### Generate a documentation preview locally
+
+To generate a documentation preview locally (without the need to deploy it to AWS) you just need to use `serverless generateDocumentation --outputFileName=filename.ext`.
+
+By default, the documentation will be generated in JSON format.
+To download it in YAML format, simply use `yml` or `yaml` extension in the "outputFileName" argument: `serverless generateDocumentation --outputFileName=filename.yml`
+
+By default, the documentation will be generated in OpenAPI 2.0 (Swagger).
+To generate it in OpenAPI 3.0, use `oas30` or `openapi30` type in the "exportType" argument: `serverless generateDocumentation --outputFileName=filename.ext --exportType oas30`
+
+**NOTE:** The documentation preview generated locally might be invalid (e.g., when some mandatory fields are missing from the `serverless.yml` documentation) and might differt from the final documentation deployed to and downloaded from AWS.
+
+### Download the documentation from AWS API Gateway
 
 To download the deployed documentation you just need to use `serverless downloadDocumentation --outputFileName=filename.ext`.
 
