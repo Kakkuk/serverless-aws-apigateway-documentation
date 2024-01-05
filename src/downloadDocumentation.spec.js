@@ -41,22 +41,22 @@ describe('ServerlessAWSDocumentation', function () {
       objectUnderTest._getRestApiId = () => {
         return Promise.resolve('testRestApiId')
       };
-
       objectUnderTest.serverless.providers.aws.request.mockReturnValue(Promise.resolve({
         body: 'some body',
       }));
-      await objectUnderTest.downloadDocumentation().then(() => {
-        expect(objectUnderTest.serverless.providers.aws.request).toHaveBeenCalledWith('APIGateway', 'getExport', {
-          stageName: 'testStage',
-          restApiId: 'testRestApiId',
-          exportType: 'swagger',
-          parameters: {
-            extensions: 'integrations',
-          },
-          accepts: 'application/json',
-        });
-        expect(objectUnderTest.fs.writeFileSync).toHaveBeenCalledWith('test.txt', 'some body');
+
+      await objectUnderTest.downloadDocumentation();
+
+      expect(objectUnderTest.serverless.providers.aws.request).toHaveBeenCalledWith('APIGateway', 'getExport', {
+        stageName: 'testStage',
+        restApiId: 'testRestApiId',
+        exportType: 'swagger',
+        parameters: {
+          extensions: 'integrations',
+        },
+        accepts: 'application/json',
       });
+      expect(objectUnderTest.fs.writeFileSync).toHaveBeenCalledWith('test.txt', 'some body');
     });
 
     it.each([['yml'], ['yaml']])('should successfully download documentation, %s extension', async (outputFileExtension) => {
@@ -67,22 +67,22 @@ describe('ServerlessAWSDocumentation', function () {
       objectUnderTest._getRestApiId = () => {
         return Promise.resolve('testRestApiId')
       };
-
       objectUnderTest.serverless.providers.aws.request.mockReturnValue(Promise.resolve({
         body: 'some body',
       }));
-      await objectUnderTest.downloadDocumentation().then(() => {
-        expect(objectUnderTest.serverless.providers.aws.request).toHaveBeenCalledWith('APIGateway', 'getExport', {
-          stageName: 'testStage',
-          restApiId: 'testRestApiId',
-          exportType: 'swagger',
-          parameters: {
-            extensions: 'integrations',
-          },
-          accepts: 'application/yaml',
-        });
-        expect(objectUnderTest.fs.writeFileSync).toHaveBeenCalledWith(outputFileName, 'some body');
+
+      await objectUnderTest.downloadDocumentation();
+
+      expect(objectUnderTest.serverless.providers.aws.request).toHaveBeenCalledWith('APIGateway', 'getExport', {
+        stageName: 'testStage',
+        restApiId: 'testRestApiId',
+        exportType: 'swagger',
+        parameters: {
+          extensions: 'integrations',
+        },
+        accepts: 'application/yaml',
       });
+      expect(objectUnderTest.fs.writeFileSync).toHaveBeenCalledWith(outputFileName, 'some body');
     });
 
     it('should successfully download documentation, json extension, using unknown export type', async () => {
@@ -93,22 +93,22 @@ describe('ServerlessAWSDocumentation', function () {
       objectUnderTest._getRestApiId = () => {
         return Promise.resolve('testRestApiId')
       };
-
       objectUnderTest.serverless.providers.aws.request.mockReturnValue(Promise.resolve({
         body: 'some body',
       }));
-      await objectUnderTest.downloadDocumentation().then(() => {
-        expect(objectUnderTest.serverless.providers.aws.request).toHaveBeenCalledWith('APIGateway', 'getExport', {
-          stageName: 'testStage',
-          restApiId: 'testRestApiId',
-          exportType: 'swagger',
-          parameters: {
-            extensions: 'integrations',
-          },
-          accepts: 'application/json',
-        });
-        expect(objectUnderTest.fs.writeFileSync).toHaveBeenCalledWith('test.json', 'some body');
+
+      await objectUnderTest.downloadDocumentation();
+
+      expect(objectUnderTest.serverless.providers.aws.request).toHaveBeenCalledWith('APIGateway', 'getExport', {
+        stageName: 'testStage',
+        restApiId: 'testRestApiId',
+        exportType: 'swagger',
+        parameters: {
+          extensions: 'integrations',
+        },
+        accepts: 'application/json',
       });
+      expect(objectUnderTest.fs.writeFileSync).toHaveBeenCalledWith('test.json', 'some body');
     });
 
     it.each([['oas30'], ['openapi30']])('should successfully download documentation, json extension, using %s export type', async (exportType) => {
@@ -119,22 +119,22 @@ describe('ServerlessAWSDocumentation', function () {
       objectUnderTest._getRestApiId = () => {
         return Promise.resolve('testRestApiId')
       };
-
       objectUnderTest.serverless.providers.aws.request.mockReturnValue(Promise.resolve({
         body: 'some body',
       }));
-      await objectUnderTest.downloadDocumentation().then(() => {
-        expect(objectUnderTest.serverless.providers.aws.request).toHaveBeenCalledWith('APIGateway', 'getExport', {
-          stageName: 'testStage',
-          restApiId: 'testRestApiId',
-          exportType: 'oas30',
-          parameters: {
-            extensions: 'integrations',
-          },
-          accepts: 'application/json',
-        });
-        expect(objectUnderTest.fs.writeFileSync).toHaveBeenCalledWith('test.json', 'some body');
+
+      await objectUnderTest.downloadDocumentation();
+
+      expect(objectUnderTest.serverless.providers.aws.request).toHaveBeenCalledWith('APIGateway', 'getExport', {
+        stageName: 'testStage',
+        restApiId: 'testRestApiId',
+        exportType: 'oas30',
+        parameters: {
+          extensions: 'integrations',
+        },
+        accepts: 'application/json',
       });
+      expect(objectUnderTest.fs.writeFileSync).toHaveBeenCalledWith('test.json', 'some body');
     });
 
     it('should successfully download documentation, yaml extension, using an extensions argument', async () => {
@@ -145,22 +145,22 @@ describe('ServerlessAWSDocumentation', function () {
       objectUnderTest._getRestApiId = () => {
         return Promise.resolve('testRestApiId')
       };
-
       objectUnderTest.serverless.providers.aws.request.mockReturnValue(Promise.resolve({
         body: 'some body',
       }));
-      await objectUnderTest.downloadDocumentation().then(() => {
-        expect(objectUnderTest.serverless.providers.aws.request).toHaveBeenCalledWith('APIGateway', 'getExport', {
-          stageName: 'testStage',
-          restApiId: 'testRestApiId',
-          exportType: 'swagger',
-          parameters: {
-            extensions: 'apigateway',
-          },
-          accepts: 'application/yaml',
-        });
-        expect(objectUnderTest.fs.writeFileSync).toHaveBeenCalledWith('test.yml', 'some body');
+
+      await objectUnderTest.downloadDocumentation();
+
+      expect(objectUnderTest.serverless.providers.aws.request).toHaveBeenCalledWith('APIGateway', 'getExport', {
+        stageName: 'testStage',
+        restApiId: 'testRestApiId',
+        exportType: 'swagger',
+        parameters: {
+          extensions: 'apigateway',
+        },
+        accepts: 'application/yaml',
       });
+      expect(objectUnderTest.fs.writeFileSync).toHaveBeenCalledWith('test.yml', 'some body');
     });
 
     it('should throw an error', () => {
