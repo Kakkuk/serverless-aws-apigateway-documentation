@@ -8,7 +8,7 @@ module.exports = {
       return aws.request('APIGateway', 'getExport', {
         stageName: aws.getStage(),
         restApiId: restApiId,
-        exportType: 'swagger',
+        exportType: exportType(this.options.exportType),
         parameters: {
           extensions: extensionType(this.options.extensions),
         },
@@ -57,5 +57,14 @@ function extensionType(extensionArg) {
   } else {
     return 'integrations';
   }
+}
+
+function exportType(exportTypeArg) {
+  let awsExportType = 'swagger';
+  if (exportTypeArg === 'oas30' || exportTypeArg === 'openapi30') {
+    awsExportType = 'oas30';
+  }
+
+  return awsExportType;
 }
 
