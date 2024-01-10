@@ -8,7 +8,7 @@ describe('ServerlessAWSDocumentation', function () {
     objectUnderTest = require('./generateDocumentation.js');
     objectUnderTest.customVars = {};
     objectUnderTest.fs = {
-      writeFileSync: jest.fn(),
+      writeFile: jest.fn(),
     };
     objectUnderTest.options = {
       outputFileName: 'openapi.json',
@@ -29,38 +29,38 @@ describe('ServerlessAWSDocumentation', function () {
     it.each([
       ['json'],
       ['unknown']
-    ])('generates a documentation in JSON format when outputFileName extension is %s', (outputFileExtension) => {
+    ])('generates a documentation in JSON format when outputFileName extension is %s', async (outputFileExtension) => {
       const outputFileName = `openapi.${outputFileExtension}`;
       objectUnderTest.options.outputFileName = outputFileName;
       objectUnderTest.serverless.service.getAllFunctions.mockReturnValue([]);
       const jsonSpy = jest.spyOn(JSON, 'stringify');
 
-      objectUnderTest.generateDocumentation();
+      await objectUnderTest.generateDocumentation();
 
       const result = jsonSpy.mock.results[0].value;
       expect(jsonSpy).toHaveBeenCalledTimes(1);
       expect(jsonSpy).toHaveBeenCalledWith(expect.anything(), null, 2);
-      expect(objectUnderTest.fs.writeFileSync).toHaveBeenCalledTimes(1);
-      expect(objectUnderTest.fs.writeFileSync).toHaveBeenCalledWith(outputFileName, result);
+      expect(objectUnderTest.fs.writeFile).toHaveBeenCalledTimes(1);
+      expect(objectUnderTest.fs.writeFile).toHaveBeenCalledWith(outputFileName, result);
     });
 
     it.each([
       ['yml'],
       ['yaml']
-    ])('generates a documentation in YAML format when outputFileName extension is %s', (outputFileExtension) => {
+    ])('generates a documentation in YAML format when outputFileName extension is %s', async (outputFileExtension) => {
       const outputFileName = `openapi.${outputFileExtension}`;
       objectUnderTest.options.outputFileName = outputFileName;
       objectUnderTest.serverless.service.getAllFunctions.mockReturnValue([]);
       const YAML = require('yaml');
       const yamlSpy = jest.spyOn(YAML, 'stringify');
 
-      objectUnderTest.generateDocumentation();
+      await objectUnderTest.generateDocumentation();
 
       const result = yamlSpy.mock.results[0].value;
       expect(yamlSpy).toHaveBeenCalledTimes(1);
       expect(yamlSpy).toHaveBeenCalledWith(expect.anything(), { indent: 2 });
-      expect(objectUnderTest.fs.writeFileSync).toHaveBeenCalledTimes(1);
-      expect(objectUnderTest.fs.writeFileSync).toHaveBeenCalledWith(outputFileName, result);
+      expect(objectUnderTest.fs.writeFile).toHaveBeenCalledTimes(1);
+      expect(objectUnderTest.fs.writeFile).toHaveBeenCalledWith(outputFileName, result);
     });
 
     it.each([
@@ -68,13 +68,13 @@ describe('ServerlessAWSDocumentation', function () {
       [null],
       [{}],
       [{ documentation: {} }]
-    ])('generates an empty documentation when none is provided: %s', (customVars) => {
+    ])('generates an empty documentation when none is provided: %s', async (customVars) => {
       objectUnderTest.customVars = customVars;
       objectUnderTest.options.outputFileName = 'openapi.json';
       objectUnderTest.serverless.service.getAllFunctions.mockReturnValue([]);
       const jsonSpy = jest.spyOn(JSON, 'stringify');
 
-      objectUnderTest.generateDocumentation();
+      await objectUnderTest.generateDocumentation();
 
       const result = jsonSpy.mock.calls[0][0];
       expect(result).toEqual(
@@ -100,7 +100,7 @@ describe('ServerlessAWSDocumentation', function () {
       ${'openapi30'} | ${'openapi'}  | ${'3.0.1'}
     `(
       'generates $expectedField field with $expectedValue value when exportType: $exportType',
-      ({
+      async ({
         exportType,
         expectedField,
         expectedValue,
@@ -109,7 +109,7 @@ describe('ServerlessAWSDocumentation', function () {
         objectUnderTest.serverless.service.getAllFunctions.mockReturnValue([]);
         const jsonSpy = jest.spyOn(JSON, 'stringify');
 
-        objectUnderTest.generateDocumentation();
+        await objectUnderTest.generateDocumentation();
 
         const result = jsonSpy.mock.calls[0][0];
         expect(result[expectedField]).toBe(expectedValue);
@@ -126,7 +126,7 @@ describe('ServerlessAWSDocumentation', function () {
       ${{version: 'any-version'}}                     | ${{title: '', version: 'any-version'}} 
     `(
       'generates info field when this is passed: $info',
-      ({
+      async ({
         info,
         expected,
       }) => {
@@ -134,7 +134,7 @@ describe('ServerlessAWSDocumentation', function () {
         objectUnderTest.serverless.service.getAllFunctions.mockReturnValue([]);
         const jsonSpy = jest.spyOn(JSON, 'stringify');
 
-        objectUnderTest.generateDocumentation();
+        await objectUnderTest.generateDocumentation();
 
         const result = jsonSpy.mock.calls[0][0];
         expect(result.info).toEqual(expected);
@@ -170,7 +170,7 @@ describe('ServerlessAWSDocumentation', function () {
       ${[{ http: { path: 'any/path', method: 'get', documentation: {} } }, { http: { path: 'any/path', method: 'post', documentation: {} } }]} | ${{'/any/path': { post: { operationId: 'AnyFunction', responses: {} } } }}
     `(
       'generates paths field when events: $events',
-      ({
+      async ({
         events,
         expected,
       }) => {
@@ -178,7 +178,7 @@ describe('ServerlessAWSDocumentation', function () {
         objectUnderTest.serverless.service.getFunction.mockReturnValue({ events: events });
         const jsonSpy = jest.spyOn(JSON, 'stringify');
 
-        objectUnderTest.generateDocumentation();
+        await objectUnderTest.generateDocumentation();
 
         const result = jsonSpy.mock.calls[0][0];
         expect(result.paths).toEqual(expected);
@@ -216,7 +216,7 @@ describe('ServerlessAWSDocumentation', function () {
       ${'swagger'} | ${[{ statusCode: 200, responseHeaders: [{ name: 'any-header' }, { name: 'any-other-header' }] }]}                                 | ${{ '200': { description: 'Status 200 response', headers: { 'any-header': {}, 'any-other-header': {} } } }}
     `(
       'generates paths.PATH.METHOD.responses field when exportType: $exportType and event methodResponses: $methodResponses',
-      ({
+      async ({
         exportType,
         methodResponses,
         expected,
@@ -228,7 +228,7 @@ describe('ServerlessAWSDocumentation', function () {
         });
         const jsonSpy = jest.spyOn(JSON, 'stringify');
 
-        objectUnderTest.generateDocumentation();
+        await objectUnderTest.generateDocumentation();
 
         const result = jsonSpy.mock.calls[0][0];
         expect(result.paths['/any/path'].get.responses).toEqual(expected);
@@ -280,7 +280,7 @@ describe('ServerlessAWSDocumentation', function () {
       ${'oas30'} | ${{ queryParams: [{ name: 'any-query-name' }], pathParams: [{ name: 'any-path-name' }], requestBody: { description: 'any-description' }, requestHeaders: [{ name: 'any-header-name' }] }} | ${[{ name: 'any-query-name', in: 'query', schema: {} }, { name: 'any-path-name', in: 'path', required: true, schema: {} }, { name: 'any-header-name', in: 'header', schema: {} }]}
     `(
       'generates paths.PATH.METHOD.parameters field when exportType: $exportType and event: $httpEvent',
-      ({
+      async ({
         exportType,
         httpEvent,
         expected,
@@ -292,7 +292,7 @@ describe('ServerlessAWSDocumentation', function () {
         });
         const jsonSpy = jest.spyOn(JSON, 'stringify');
 
-        objectUnderTest.generateDocumentation();
+        await objectUnderTest.generateDocumentation();
 
         const result = jsonSpy.mock.calls[0][0];
         expect(result.paths['/any/path'].get.parameters).toEqual(expected);
@@ -313,7 +313,7 @@ describe('ServerlessAWSDocumentation', function () {
       ${'swagger'} | ${{ requestBody: { description: 'any-description' }, requestModels: { 'application/json': 'AnyModel' } }} | ${undefined}
     `(
       'generates paths.PATH.METHOD.requestBody field when exportType: $exportType and event: $httpEvent',
-      ({
+      async ({
         exportType,
         httpEvent,
         expected,
@@ -325,7 +325,7 @@ describe('ServerlessAWSDocumentation', function () {
         });
         const jsonSpy = jest.spyOn(JSON, 'stringify');
 
-        objectUnderTest.generateDocumentation();
+        await objectUnderTest.generateDocumentation();
 
         const result = jsonSpy.mock.calls[0][0];
         expect(result.paths['/any/path'].get.requestBody).toEqual(expected);
@@ -348,7 +348,7 @@ describe('ServerlessAWSDocumentation', function () {
       ${[{ name: 'AnyModel', schema: { type: 'any-type' } }, { name: 'AnyOtherModel', schema: {} }]} | ${{ 'AnyModel': { type: 'any-type' }, 'AnyOtherModel': {} }}
     `(
       'generates definitions field when exportType: swagger and models: $models',
-      ({
+      async ({
         models,
         expected,
       }) => {
@@ -357,7 +357,7 @@ describe('ServerlessAWSDocumentation', function () {
         objectUnderTest.serverless.service.getAllFunctions.mockReturnValue([]);
         const jsonSpy = jest.spyOn(JSON, 'stringify');
 
-        objectUnderTest.generateDocumentation();
+        await objectUnderTest.generateDocumentation();
 
         const result = jsonSpy.mock.calls[0][0];
         expect(result.definitions).toEqual(expected);
@@ -377,7 +377,7 @@ describe('ServerlessAWSDocumentation', function () {
       ${[{ name: 'AnyModel', schema: { type: 'any-type' } }, { name: 'AnyOtherModel', schema: {} }]} | ${{ schemas: { 'AnyModel': { type: 'any-type' }, 'AnyOtherModel': {} }, securitySchemes: {} }}
     `(
       'generates components.schemas field when exportType: oas30 and models: $models',
-      ({
+      async ({
         models,
         expected,
       }) => {
@@ -386,7 +386,7 @@ describe('ServerlessAWSDocumentation', function () {
         objectUnderTest.serverless.service.getAllFunctions.mockReturnValue([]);
         const jsonSpy = jest.spyOn(JSON, 'stringify');
 
-        objectUnderTest.generateDocumentation();
+        await objectUnderTest.generateDocumentation();
 
         const result = jsonSpy.mock.calls[0][0];
         expect(result.components).toEqual(expected);
@@ -402,7 +402,7 @@ describe('ServerlessAWSDocumentation', function () {
       ${{ sc1: { type: 'any-type' }, sc2: { type: 'any-other-type' } }} | ${{ sc1: { type: 'any-type' }, sc2: { type: 'any-other-type' } }}
     `(
       'generates securityDefinitions field when exportType: swagger and securitySchemes: $securitySchemes',
-      ({
+      async ({
         securitySchemes,
         expected,
       }) => {
@@ -411,7 +411,7 @@ describe('ServerlessAWSDocumentation', function () {
         objectUnderTest.serverless.service.getAllFunctions.mockReturnValue([]);
         const jsonSpy = jest.spyOn(JSON, 'stringify');
 
-        objectUnderTest.generateDocumentation();
+        await objectUnderTest.generateDocumentation();
 
         const result = jsonSpy.mock.calls[0][0];
         expect(result.securityDefinitions).toEqual(expected);
@@ -427,7 +427,7 @@ describe('ServerlessAWSDocumentation', function () {
       ${{ sc1: { type: 'any-type' }, sc2: { type: 'any-other-type' } }} | ${{ schemas: {}, securitySchemes: { sc1: { type: 'any-type' }, sc2: { type: 'any-other-type' } } }}
     `(
       'generates components.securitySchemes field when exportType: oas30 and securitySchemes: $securitySchemes',
-      ({
+      async ({
         securitySchemes,
         expected,
       }) => {
@@ -436,7 +436,7 @@ describe('ServerlessAWSDocumentation', function () {
         objectUnderTest.serverless.service.getAllFunctions.mockReturnValue([]);
         const jsonSpy = jest.spyOn(JSON, 'stringify');
 
-        objectUnderTest.generateDocumentation();
+        await objectUnderTest.generateDocumentation();
 
         const result = jsonSpy.mock.calls[0][0];
         expect(result.components).toEqual(expected);
@@ -453,7 +453,7 @@ describe('ServerlessAWSDocumentation', function () {
       ${[{name: 'any-tag', description: 'any-description'}, {name: 'any-other-tag'}]} | ${[{name: 'any-tag', description: 'any-description'}, {name: 'any-other-tag'}]}
     `(
       'generates tags field when this is passed: $tags',
-      ({
+      async ({
         tags,
         expected,
       }) => {
@@ -461,7 +461,7 @@ describe('ServerlessAWSDocumentation', function () {
         objectUnderTest.serverless.service.getAllFunctions.mockReturnValue([]);
         const jsonSpy = jest.spyOn(JSON, 'stringify');
 
-        objectUnderTest.generateDocumentation();
+        await objectUnderTest.generateDocumentation();
 
         const result = jsonSpy.mock.calls[0][0];
         expect(result.tags).toEqual(expected);
