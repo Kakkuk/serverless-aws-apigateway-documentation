@@ -45,7 +45,8 @@ module.exports = {
     } else {
       output = JSON.stringify(documentation, null, 2);
     }
-    this.fs.writeFile(this.options.outputFileName, output);
+
+    return this.fs.writeFile(this.options.outputFileName, output);
   },
 };
 
