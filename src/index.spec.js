@@ -78,6 +78,7 @@ describe('ServerlessAWSDocumentation', function () {
         'before:package:finalize': this.plugin._beforeDeploy,
         'after:deploy:deploy': this.plugin._afterDeploy,
         'downloadDocumentation:downloadDocumentation': this.plugin._download,
+        'generateDocumentation:generateDocumentation': this.plugin._generate,
       });
     });
 

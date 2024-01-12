@@ -4,6 +4,7 @@ const models = require('./models');
 const swagger = require('./swagger');
 const fs = require('fs');
 const downloadDocumentation = require('./downloadDocumentation');
+const generateDocumentation = require('./generateDocumentation');
 
 class ServerlessAWSDocumentation {
   constructor(serverless, options) {
@@ -16,6 +17,7 @@ class ServerlessAWSDocumentation {
     Object.assign(this, swagger);
     Object.assign(this, documentation());
     Object.assign(this, downloadDocumentation);
+    Object.assign(this, generateDocumentation);
 
     this.customVars = this.serverless.service.custom;
     const naming = this.serverless.providers.aws.naming;
@@ -25,11 +27,13 @@ class ServerlessAWSDocumentation {
     this._beforeDeploy = this.beforeDeploy.bind(this)
     this._afterDeploy = this.afterDeploy.bind(this)
     this._download = downloadDocumentation.downloadDocumentation.bind(this)
+    this._generate = generateDocumentation.generateDocumentation.bind(this)
 
     this.hooks = {
       'before:package:finalize': this._beforeDeploy,
       'after:deploy:deploy': this._afterDeploy,
-      'downloadDocumentation:downloadDocumentation': this._download
+      'downloadDocumentation:downloadDocumentation': this._download,
+      'generateDocumentation:generateDocumentation': this._generate,
     };
 
     this.documentationParts = [];
@@ -53,6 +57,22 @@ class ServerlessAWSDocumentation {
                     required: false,
                     type: 'multiple'
                 },
+            },
+        },
+        generateDocumentation: {
+            usage: 'Generate API Gateway documentation locally',
+            lifecycleEvents: [
+              'generateDocumentation',
+            ],
+            options: {
+              outputFileName: {
+                required: true,
+                type: 'string',
+              },
+              exportType: {
+                required: false,
+                type: 'string',
+              }
             },
         }
     };
