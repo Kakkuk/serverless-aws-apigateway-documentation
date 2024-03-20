@@ -316,7 +316,7 @@ To download it in YAML format, simply use `yml` or `yaml` extension in the "outp
 By default, the documentation will be generated in OpenAPI 2.0 (Swagger).
 To generate it in OpenAPI 3.0, use `oas30` or `openapi30` type in the "exportType" argument: `serverless generateDocumentation --outputFileName=filename.ext --exportType oas30`
 
-**NOTE:** The documentation preview generated locally might be invalid (e.g., when some mandatory fields are missing from the `serverless.yml` documentation) and might differt from the final documentation deployed to and downloaded from AWS.
+**NOTE:** The documentation preview generated locally might be invalid (e.g., when some mandatory fields are missing from the `serverless.yml` documentation) and might differ from the final documentation deployed to and downloaded from AWS.
 
 ### Download the documentation from AWS API Gateway
 
