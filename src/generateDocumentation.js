@@ -309,7 +309,7 @@ function generateModelSchema(templateSchema) {
       if (match) {
         field = `#/components/schemas/${match[1]}`;
       }
-    } else if (!Array.isArray(field) && typeof field === "object" && field) {
+    } else if (field.constructor === Object && field) {
       // NOTE: We are only interested in looping through "items" and "properties" fields (which are both objects)!
       field = generateModelSchema(field);
     }
