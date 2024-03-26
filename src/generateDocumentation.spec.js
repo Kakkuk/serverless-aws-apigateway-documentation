@@ -346,6 +346,12 @@ describe('ServerlessAWSDocumentation', function () {
       ${[{ name: 'AnyModel', schema: { type: 'any-type' } }]}                                        | ${{ 'AnyModel': { type: 'any-type' } }}
       ${[{ name: 'AnyModel', contentType: 'application/json', schema: { type: 'any-type' } }]}       | ${{ 'AnyModel': { type: 'any-type' } }}
       ${[{ name: 'AnyModel', schema: { type: 'any-type' } }, { name: 'AnyOtherModel', schema: {} }]} | ${{ 'AnyModel': { type: 'any-type' }, 'AnyOtherModel': {} }}
+      ${[{ name: 'AnyModel', schema: { type: 'array', items: { '$ref': 'http://path/to/AnyOtherModel' } } }]}                                               | ${{ 'AnyModel': { type: 'array', items: { '$ref': 'http://path/to/AnyOtherModel' } } }}
+      ${[{ name: 'AnyModel', schema: { type: 'array', items: { '$ref': '{{model: AnyOtherModel}}' } } }]}                                                   | ${{ 'AnyModel': { type: 'array', items: { '$ref': '#/components/schemas/AnyOtherModel' } } }}
+      ${[{ name: 'AnyModel', schema: { type: 'object', required: ['id'], properties: { id: { type: 'string', default: '' } } } }]}                          | ${{ 'AnyModel': { type: 'object', required: ['id'], properties: { id: { type: 'string', default: '' } } } }}
+      ${[{ name: 'AnyModel', schema: { type: 'object', required: ['id'], properties: { id: { type: 'integer', minimum: 1, exclusiveMinimum: false } } } }]} | ${{ 'AnyModel': { type: 'object', required: ['id'], properties: { id: { type: 'integer', minimum: 1, exclusiveMinimum: false } } } }}
+      ${[{ name: 'AnyModel', schema: { type: 'object', required: ['id'], properties: { id: { '$ref': '{{model: AnyOtherModel}}' } } } }]}                   | ${{ 'AnyModel': { type: 'object', required: ['id'], properties: { id: { '$ref': '#/components/schemas/AnyOtherModel' } } } }}
+      ${[{ name: 'AnyModel', schema: { type: 'object', properties: { ids: { type: 'array', items: { '$ref': '{{model: AnyOtherModel}}' } } } } }]}          | ${{ 'AnyModel': { type: 'object', properties: { ids: { type: 'array', items: { '$ref': '#/components/schemas/AnyOtherModel' } } } } }}
     `(
       'generates definitions field when exportType: swagger and models: $models',
       async ({
@@ -375,6 +381,12 @@ describe('ServerlessAWSDocumentation', function () {
       ${[{ name: 'AnyModel', schema: { type: 'any-type' } }]}                                        | ${{ schemas: { 'AnyModel': { type: 'any-type' } }, securitySchemes: {} }}
       ${[{ name: 'AnyModel', contentType: 'application/json', schema: { type: 'any-type' } }]}       | ${{ schemas: { 'AnyModel': { type: 'any-type' } }, securitySchemes: {} }}
       ${[{ name: 'AnyModel', schema: { type: 'any-type' } }, { name: 'AnyOtherModel', schema: {} }]} | ${{ schemas: { 'AnyModel': { type: 'any-type' }, 'AnyOtherModel': {} }, securitySchemes: {} }}
+      ${[{ name: 'AnyModel', schema: { type: 'array', items: { '$ref': 'http://path/to/AnyOtherModel' } } }]}                                               | ${{ schemas: { 'AnyModel': { type: 'array', items: { '$ref': 'http://path/to/AnyOtherModel' } } }, securitySchemes: {} }}
+      ${[{ name: 'AnyModel', schema: { type: 'array', items: { '$ref': '{{model: AnyOtherModel}}' } } }]}                                                   | ${{ schemas: { 'AnyModel': { type: 'array', items: { '$ref': '#/components/schemas/AnyOtherModel' } } }, securitySchemes: {} }}
+      ${[{ name: 'AnyModel', schema: { type: 'object', required: ['id'], properties: { id: { type: 'string', default: '', nullable: false } } } }]}         | ${{ schemas: { 'AnyModel': { type: 'object', required: ['id'], properties: { id: { type: 'string', default: '', nullable: false } } } }, securitySchemes: {} }}
+      ${[{ name: 'AnyModel', schema: { type: 'object', required: ['id'], properties: { id: { type: 'integer', minimum: 1, exclusiveMinimum: false } } } }]} | ${{ schemas: { 'AnyModel': { type: 'object', required: ['id'], properties: { id: { type: 'integer', minimum: 1, exclusiveMinimum: false } } } }, securitySchemes: {} }}
+      ${[{ name: 'AnyModel', schema: { type: 'object', required: ['id'], properties: { id: { '$ref': '{{model: AnyOtherModel}}' } } } }]}                   | ${{ schemas: { 'AnyModel': { type: 'object', required: ['id'], properties: { id: { '$ref': '#/components/schemas/AnyOtherModel' } } } }, securitySchemes: {} }}
+      ${[{ name: 'AnyModel', schema: { type: 'object', properties: { ids: { type: 'array', items: { '$ref': '{{model: AnyOtherModel}}' } } } } }]}          | ${{ schemas: { 'AnyModel': { type: 'object', properties: { ids: { type: 'array', items: { '$ref': '#/components/schemas/AnyOtherModel' } }} } }, securitySchemes: {} }}
     `(
       'generates components.schemas field when exportType: oas30 and models: $models',
       async ({

@@ -292,10 +292,31 @@ function generateModels(templateModels) {
 
   templateModels.forEach((templateModel) => {
     if (!templateModel.name || !templateModel.schema) return;
-    models[templateModel.name] = templateModel.schema;
+    models[templateModel.name] = generateModelSchema(templateModel.schema);
   });
 
   return models;
+}
+
+function generateModelSchema(templateSchema) {
+  if (!templateSchema) return templateSchema;
+
+  let schema = {};
+  Object.keys(templateSchema).forEach((key) => {
+    let field = templateSchema[key];
+    if (field && key === "$ref") {
+      const match = /{{\s*model\s*:\s*([\-\w]+)\s*}}/.exec(field);
+      if (match) {
+        field = `#/components/schemas/${match[1]}`;
+      }
+    } else if (field && field.constructor === Object) {
+      // NOTE: We are only interested in looping through "items" and "properties" fields (which are both objects)!
+      field = generateModelSchema(field);
+    }
+    schema[key] = field;
+  });
+
+  return schema;
 }
 
 function generateSchema(field, excludeKeys) {
