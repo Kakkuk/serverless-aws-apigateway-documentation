@@ -304,12 +304,12 @@ function generateModelSchema(templateSchema) {
   let schema = {};
   Object.keys(templateSchema).forEach((key) => {
     let field = templateSchema[key];
-    if (key === "$ref") {
+    if (field && key === "$ref") {
       const match = /{{\s*model\s*:\s*([\-\w]+)\s*}}/.exec(field);
       if (match) {
         field = `#/components/schemas/${match[1]}`;
       }
-    } else if (field.constructor === Object && field) {
+    } else if (field && field.constructor === Object) {
       // NOTE: We are only interested in looping through "items" and "properties" fields (which are both objects)!
       field = generateModelSchema(field);
     }
