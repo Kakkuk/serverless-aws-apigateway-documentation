@@ -46,6 +46,39 @@ function determinePropertiesToGet (type) {
 
 var autoVersion;
 
+
+async function getAllDocumentationParts(aws, restApiId) {
+  let allDocumentationParts = [];
+  let nextToken = null;
+
+  do {
+    const params = {
+      restApiId: restApiId,
+      limit: 500
+    };
+
+    if (nextToken) {
+      params.position = nextToken;
+    }
+
+    try {
+      const response = await aws.request('APIGateway', 'getDocumentationParts', params);
+      
+      if (response.items) {
+        allDocumentationParts = allDocumentationParts.concat(response.items);
+      }
+
+      nextToken = response.position;
+    } catch (error) {
+      console.error('Error fetching documentation parts:', error);
+      throw error;
+    }
+  } while (nextToken);
+
+  return allDocumentationParts;
+}
+
+
 module.exports = function() {
   return {
     _createDocumentationPart: function _createDocumentationPart(part, def, knownLocation) {
@@ -93,47 +126,51 @@ module.exports = function() {
       });
     },
 
-    _updateDocumentation: function _updateDocumentation() {
+    _updateDocumentation: async function _updateDocumentation() {
       const aws = this.serverless.providers.aws;
-      return aws.request('APIGateway', 'getDocumentationVersion', {
-        restApiId: this.restApiId,
-        documentationVersion: this.getDocumentationVersion(),
-      }).then(() => {
-          const msg = 'documentation version already exists, skipping upload';
-          console.info('-------------------');
-          console.info(msg);
-          return Promise.reject(msg);
-        }, err => {
-          if (err.providerError && err.providerError.statusCode === 404) {
-            return Promise.resolve();
-          }
 
-          return Promise.reject(err);
-        })
-        .then(() =>
-          aws.request('APIGateway', 'getDocumentationParts', {
-            restApiId: this.restApiId,
-            limit: 9999,
-          })
-        )
-        .then(results => results.items.map(
-          part => aws.request('APIGateway', 'deleteDocumentationPart', {
-            documentationPartId: part.id,
-            restApiId: this.restApiId,
-          })
-        ))
-        .then(promises => Promise.all(promises))
-        .then(() => this.documentationParts.reduce((promise, part) => {
-          return promise.then(() => {
-            part.properties = JSON.stringify(part.properties);
-            return aws.request('APIGateway', 'createDocumentationPart', part);
-          });
-        }, Promise.resolve()))
-        .then(() => aws.request('APIGateway', 'createDocumentationVersion', {
+      try {
+        // Check if documentation version exists
+        await aws.request('APIGateway', 'getDocumentationVersion', {
           restApiId: this.restApiId,
           documentationVersion: this.getDocumentationVersion(),
-          stageName: this.options.stage,
-        }));
+        });
+
+        const msg = 'documentation version already exists, skipping upload';
+        console.info('-------------------');
+        console.info(msg);
+        return;
+
+      } catch (err) {
+        if (!(err.providerError && err.providerError.statusCode === 404)) {
+          throw err;
+        }
+        // If 404, continue with the update process
+      }
+
+      // Get all existing documentation parts
+      const existingParts = await getAllDocumentationParts(aws, this.restApiId);
+
+      // Delete all existing documentation parts
+      await Promise.all(existingParts.map(part => 
+        aws.request('APIGateway', 'deleteDocumentationPart', {
+          documentationPartId: part.id,
+          restApiId: this.restApiId,
+        })
+      ));
+
+      // Create new documentation parts
+      for (const part of this.documentationParts) {
+        part.properties = JSON.stringify(part.properties);
+        await aws.request('APIGateway', 'createDocumentationPart', part);
+      }
+
+      // Create new documentation version
+      await aws.request('APIGateway', 'createDocumentationVersion', {
+        restApiId: this.restApiId,
+        documentationVersion: this.getDocumentationVersion(),
+        stageName: this.options.stage,
+      });
     },
 
     getGlobalDocumentationParts: function getGlobalDocumentationParts() {
@@ -185,7 +222,7 @@ module.exports = function() {
       return this.customVars.documentation.version || autoVersion || this.generateAutoDocumentationVersion();
     },
 
-    _buildDocumentation: function _buildDocumentation(result) {
+    _buildDocumentation: async function _buildDocumentation(result) {
       this.restApiId = result.Stacks[0].Outputs
         .filter(output => output.OutputKey === 'AwsDocApiId')
         .map(output => output.OutputValue)[0];
