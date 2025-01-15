@@ -2602,7 +2602,7 @@ describe('ServerlessAWSDocumentation', function () {
           'getDocumentationParts',
           {
             restApiId: 'superid',
-            limit: 9999,
+            limit: 500,
           }
         );
 
@@ -2915,7 +2915,7 @@ describe('ServerlessAWSDocumentation', function () {
           'getDocumentationParts',
           {
             restApiId: 'superid',
-            limit: 9999,
+            limit: 500,
           }
         );
 

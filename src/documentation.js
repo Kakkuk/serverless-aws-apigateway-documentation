@@ -139,7 +139,7 @@ module.exports = function() {
         const msg = 'documentation version already exists, skipping upload';
         console.info('-------------------');
         console.info(msg);
-        throw new Error(msg);  
+        return;
 
       } catch (err) {
         if (!(err.providerError && err.providerError.statusCode === 404)) {
@@ -222,7 +222,7 @@ module.exports = function() {
       return this.customVars.documentation.version || autoVersion || this.generateAutoDocumentationVersion();
     },
 
-    _buildDocumentation: function _buildDocumentation(result) {
+    _buildDocumentation: async function _buildDocumentation(result) {
       this.restApiId = result.Stacks[0].Outputs
         .filter(output => output.OutputKey === 'AwsDocApiId')
         .map(output => output.OutputValue)[0];
